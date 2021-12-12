@@ -8,6 +8,6 @@ mod tests {
     #[test]
     fn test_sample() {
         let result = test();
-        assert_eq!(result, 2);
+        assert_eq!(result, 3);
     }
 }
