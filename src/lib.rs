@@ -1,12 +1,13 @@
-pub fn test() {
-    println!("test test!");
+pub fn test() -> i32 {
+    1 + 1
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    fn test_sample() {
+        let result = test();
+        assert_eq!(result, 2);
     }
 }
