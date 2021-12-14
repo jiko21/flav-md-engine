@@ -1,3 +1,5 @@
+mod util;
+
 pub fn test() -> i32 {
     1 + 1
 }
