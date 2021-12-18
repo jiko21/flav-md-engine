@@ -5,11 +5,11 @@ pub mod string {
 
     pub fn escape_code_string(content: &String) -> String {
         content
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace("\"", "&quot;")
-        .replace("'", "&#39;")
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&#39;")
     }
 
     #[cfg(test)]
@@ -64,7 +64,9 @@ a"#;
                 TestCase {
                     it: String::from("should correctly escape whole script tag"),
                     input: String::from(r#"<script src="/a/b.js">alert('aaa')</script>"#),
-                    expected: String::from("&lt;script src=&quot;/a/b.js&quot;&gt;alert(&#39;aaa&#39;)&lt;/script&gt;"),
+                    expected: String::from(
+                        "&lt;script src=&quot;/a/b.js&quot;&gt;alert(&#39;aaa&#39;)&lt;/script&gt;",
+                    ),
                 },
             ];
             for test_case in test_cases.iter() {

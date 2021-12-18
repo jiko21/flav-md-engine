@@ -1,3 +1,4 @@
+mod lexer;
 mod util;
 
 pub fn test() -> i32 {
