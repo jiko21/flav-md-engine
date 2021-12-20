@@ -1,25 +1,17 @@
 pub mod code_block {
     use crate::util::string::string::escape_code_string;
+    use once_cell::sync::Lazy;
     use regex::Regex;
 
-    pub struct CodeBlock {
-        pattern: Regex,
+    static CODE_BLOCK_PAREN_PATTERN: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r"^```[^`|.]*$").unwrap());
+
+    pub fn is_code_block_start(input: &String) -> bool {
+        CODE_BLOCK_PAREN_PATTERN.is_match(input)
     }
 
-    impl CodeBlock {
-        pub fn new() -> Self {
-            CodeBlock {
-                pattern: Regex::new(r"^```[^`|.]*$").unwrap(),
-            }
-        }
-
-        pub fn is_code_block_start(&self, input: &String) -> bool {
-            self.pattern.is_match(input)
-        }
-
-        pub fn parse_code_block(&self, input: Vec<String>) -> Vec<String> {
-            input.iter().map(|s| escape_code_string(s)).collect()
-        }
+    pub fn parse_code_block(input: Vec<String>) -> Vec<String> {
+        input.iter().map(|s| escape_code_string(s)).collect()
     }
 
     #[cfg(test)]
@@ -34,7 +26,6 @@ pub mod code_block {
                 input: String,
                 expected: bool,
             }
-            let parser = CodeBlock::new();
             let test_cases = [
                 TestCase {
                     it: String::from("should return true when input is ```"),
@@ -58,14 +49,13 @@ pub mod code_block {
                 },
             ];
             for test_case in test_cases.iter() {
-                let output = parser.is_code_block_start(&test_case.input);
+                let output = is_code_block_start(&test_case.input);
                 assert_eq!(output, test_case.expected, "Failed: {}\n", test_case.it);
             }
         }
 
         #[test]
         fn test_parse_code_block() {
-            let parser = CodeBlock::new();
             let input = [
                 r#"<script src="/a/b.js">alert('aaa')</script>"#,
                 r#"'aaa'"#,
@@ -82,7 +72,7 @@ pub mod code_block {
             .iter()
             .map(|&s| s.into())
             .collect();
-            let output = parser.parse_code_block(input);
+            let output = parse_code_block(input);
             assert_eq!(output, expected);
         }
     }
