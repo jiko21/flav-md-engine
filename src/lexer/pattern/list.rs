@@ -10,7 +10,7 @@ pub mod list {
     static NUMBER_LIST_PATTERN: Lazy<Regex> =
         Lazy::new(|| Regex::new(r"^([\s\s]*)\d+\.\s(.+)").unwrap());
 
-    #[derive(Clone, Copy)]
+    #[derive(Clone, Copy, Debug)]
     pub enum ListPattern {
         SimpleList,
         NumberList,
@@ -81,7 +81,17 @@ pub mod list {
                     ElementNode::Exist {
                         ref mut content, ..
                     } => match &mut **content {
-                        Content::ElementNodes { ref mut value } => value.push(parse_result),
+                        Content::ElementNodes { ref mut value } => {
+                            match value.last_mut() {
+                                Some(value) => match value {
+                                    ElementNode::Exist {
+                                        ref mut children, ..
+                                    } => *children = Box::new(parse_result),
+                                    _ => panic!(""),
+                                },
+                                _ => panic!(""),
+                            };
+                        }
                         _ => panic!("Type is not correct"),
                     },
                     _ => panic!("Type is not correct"),
@@ -114,6 +124,8 @@ pub mod list {
     mod test_list {
         use super::*;
         use crate::lexer::lexer::lexer::Content::{ElementNodes, PlainText};
+        use crate::lexer::pattern::list::list::ListPattern::NumberList;
+        use crate::{content_element_nodes, content_plain_text, element_node};
 
         #[test]
         fn test_is_number_list() {
@@ -193,30 +205,113 @@ pub mod list {
             struct TestCase {
                 it: String,
                 input: Vec<String>,
+                pattern: ListPattern,
                 expected: ElementNode,
             }
-            let test_cases = [TestCase {
-                it: String::from("should correctly parse simple list"),
-                input: ["* hogehoge"].iter().map(|&s| s.into()).collect(),
-                expected: ElementNode::Exist {
-                    tag: Token::Ul,
-                    content: Box::new(Content::ElementNodes {
-                        value: vec![ElementNode::Exist {
-                            tag: Token::Li,
-                            content: Box::new(Content::PlainText {
-                                value: "hogehoge".to_string(),
-                            }),
-                            children: Box::new(ElementNode::Nil),
-                        }],
-                    }),
-                    children: Box::new(ElementNode::Nil),
+            let test_cases = [
+                TestCase {
+                    it: String::from("should correctly parse simple list"),
+                    input: [
+                        "* hogehoge",
+                        "* hogehoge1",
+                        "  * this is test",
+                        "  * hogehoge3",
+                        "    * hoge 4",
+                        "* hogehoge4",
+                    ]
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
+                    pattern: ListPattern::SimpleList,
+                    expected: element_node! {
+                        tag: Token::Ul,
+                        content: content_element_nodes![
+                            element_node! {
+                                tag: Token::Li,
+                                content: content_plain_text!("hogehoge".to_string()),
+                            },
+                            element_node! {
+                                tag: Token::Li,
+                                content: content_plain_text!("hogehoge1".to_string()),
+                                children: element_node! {
+                                    tag: Token::Ul,
+                                    content: content_element_nodes![
+                                        element_node! {
+                                            tag: Token::Li,
+                                            content: content_plain_text!("this is test".to_string()),
+                                        },
+                                        element_node! {
+                                            tag: Token::Li,
+                                            content: content_plain_text!("hogehoge3".to_string()),
+                                            children: element_node! {
+                                                tag: Token::Ul,
+                                                content: content_element_nodes![
+                                                    element_node! {
+                                                        tag: Token::Li,
+                                                        content: content_plain_text!("hoge 4".to_string()),
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                            element_node! {
+                                tag: Token::Li,
+                                content: content_plain_text!("hogehoge4".to_string()),
+                            },
+                        ]
+                    },
                 },
-            }];
+                TestCase {
+                    it: String::from("should correctly parse number list"),
+                    input: ["1. hoge1", "2. hoge2", "  1. aaa", "  2. ccc", "    1. ddd"]
+                        .iter()
+                        .map(|s| s.to_string())
+                        .collect(),
+                    pattern: ListPattern::NumberList,
+                    expected: element_node! {
+                        tag: Token::Ol,
+                        content: content_element_nodes![
+                            element_node! {
+                                tag: Token::Li,
+                                content: content_plain_text!("hoge1".to_string()),
+                            },
+                            element_node! {
+                                tag: Token::Li,
+                                content: content_plain_text!("hoge2".to_string()),
+                                children: element_node! {
+                                    tag: Token::Ol,
+                                    content: content_element_nodes![
+                                        element_node! {
+                                            tag: Token::Li,
+                                            content: content_plain_text!("aaa".to_string()),
+                                        },
+                                        element_node! {
+                                            tag: Token::Li,
+                                            content: content_plain_text!("ccc".to_string()),
+                                            children: element_node! {
+                                                tag: Token::Ol,
+                                                content: content_element_nodes![
+                                                    element_node! {
+                                                        tag: Token::Li,
+                                                        content: content_plain_text!("ddd".to_string()),
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                    ],
+                                }
+                            },
+                        ]
+                    },
+                },
+            ];
 
             for test_case in test_cases.iter() {
                 let output = parse_list(
                     test_case.input.iter().map(|s| s.into()).collect(),
-                    ListPattern::SimpleList,
+                    test_case.pattern,
                     0,
                 );
                 assert_eq!(output, test_case.expected, "Failed: {}\n", test_case.it);
