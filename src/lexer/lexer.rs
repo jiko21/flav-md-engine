@@ -95,8 +95,38 @@ pub mod lexer {
         }
     }
 
-    // #[macro_export]
-    // macro_rules! element_node {
-    //     (tag : $val:expr, )
-    // }
+    #[macro_export]
+    macro_rules! element_node {
+        (tag: $tag:expr, content: $content:expr, children: $children:expr $(,)? ) => {
+            ElementNode::Exist {
+                tag: $tag,
+                content: Box::new($content),
+                children: Box::new($children),
+            }
+        };
+        (tag: $tag:expr, content: $content:expr $(,)? ) => {
+            ElementNode::Exist {
+                tag: $tag,
+                content: Box::new($content),
+                children: Box::new(element_node!()),
+            }
+        };
+        () => {
+            ElementNode::Nil
+        };
+    }
+
+    #[macro_export]
+    macro_rules! content_element_nodes {
+        ($($x : expr), + $(,) ? ) => {
+            Content::ElementNodes { value: vec![$($x), +] }
+        };
+    }
+
+    #[macro_export]
+    macro_rules! content_plain_text {
+        ($value:expr $(,)? ) => {
+            Content::PlainText { value: $value }
+        };
+    }
 }
