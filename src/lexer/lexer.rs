@@ -39,18 +39,30 @@ pub mod lexer {
 
     #[derive(Debug, PartialEq)]
     pub struct Table {
-        head: Vec<TableHead>,
-        body: Vec<Vec<String>>,
+        pub head: Vec<TableHead>,
+        pub body: Vec<Vec<String>>,
+    }
+
+    impl Table {
+        pub fn new(head: Vec<TableHead>, body: Vec<Vec<String>>) -> Self {
+            Table { head, body }
+        }
     }
 
     #[derive(Debug, PartialEq)]
-    struct TableHead {
+    pub struct TableHead {
         cell: String,
         align: Align,
     }
 
-    #[derive(Debug, PartialEq)]
-    enum Align {
+    impl TableHead {
+        pub fn new(cell: String, align: Align) -> Self {
+            TableHead { cell, align }
+        }
+    }
+
+    #[derive(Debug, Copy, Clone, PartialEq)]
+    pub enum Align {
         Center,
         Left,
         Right,
@@ -93,6 +105,16 @@ pub mod lexer {
                 children,
             }
         }
+    }
+
+    #[macro_export]
+    macro_rules! table {
+        (head: $head:expr, body: $body:expr $(,)? ) => {
+            Table {
+                head: $head,
+                body: $body,
+            }
+        };
     }
 
     #[macro_export]

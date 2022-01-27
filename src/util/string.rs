@@ -12,6 +12,15 @@ pub mod string {
             .replace("'", "&#39;")
     }
 
+    #[macro_export]
+    macro_rules! vec_string {
+        ($($x : expr), + $(,) ? ) => {
+            vec![$($x), +].iter()
+                .map(|s| s.to_string())
+                .collect()
+        }
+    }
+
     #[cfg(test)]
     mod test_split_string {
         use super::*;
