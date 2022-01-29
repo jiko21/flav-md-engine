@@ -6,7 +6,10 @@ pub mod quote {
         Lazy::new(|| Regex::new(r"^>\s*([\s>]*.+)").unwrap());
 
     pub fn is_quote_block(input: &String) -> bool {
-        input.chars().nth(0).unwrap() == '>'
+        match input.chars().nth(0) {
+            Some(c) => c == '>',
+            None => false,
+        }
     }
 
     pub fn enclose_quote(input: Vec<String>) -> Vec<String> {
