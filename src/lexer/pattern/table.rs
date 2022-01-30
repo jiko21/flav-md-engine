@@ -13,10 +13,15 @@ pub mod table {
     static RIGHT_COLUMN: Lazy<Regex> = Lazy::new(|| Regex::new(r"^-+:$").unwrap());
 
     pub fn is_table_block_start(input: &String) -> bool {
-        if input.chars().nth(0).unwrap() == '|' && input.chars().last().unwrap() == '|' {
-            TABLE_HEAD_PATTERN.is_match(&input[1..])
-        } else {
-            false
+        match input.chars().nth(0) {
+            Some(c) => {
+                if c == '|' && input.chars().last().unwrap() == '|' {
+                    TABLE_HEAD_PATTERN.is_match(&input[1..])
+                } else {
+                    false
+                }
+            }
+            None => false,
         }
     }
 
