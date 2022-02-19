@@ -46,6 +46,13 @@ pub mod lexer {
             .to_string()
         }
 
+        pub fn is_head(&self) -> bool {
+            match *self {
+                Token::H1 | Token::H2 | Token::H3 | Token::H4 | Token::H5 | Token::H6 => true,
+                _ => false,
+            }
+        }
+
         pub fn value_of(number: i8) -> Self {
             match number {
                 1 => Token::H1,
@@ -73,13 +80,17 @@ pub mod lexer {
 
     #[derive(Debug, PartialEq)]
     pub struct TableHead {
-        cell: String,
+        pub cell: String,
         align: Align,
     }
 
     impl TableHead {
         pub fn new(cell: String, align: Align) -> Self {
             TableHead { cell, align }
+        }
+
+        pub fn get_align(&self) -> String {
+            self.align.value()
         }
     }
 
