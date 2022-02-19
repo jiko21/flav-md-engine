@@ -51,8 +51,6 @@ pub mod table {
     fn get_table_head_info(input: Vec<String>) -> Vec<TableHead> {
         let head = get_table_column_name(&input.get(0).unwrap()[1..].to_string());
         let align = get_column_align(&input.get(1).unwrap()[1..].to_string());
-        println!("head: {:?}", head);
-        println!("align: {:?}", align);
         let mut rslt: Vec<TableHead> = vec![];
         for i in 0..head.len() {
             rslt.push(TableHead::new(
