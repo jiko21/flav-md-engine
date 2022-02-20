@@ -57,6 +57,11 @@ impl FlavMd {
 /// ```
 /// use flav_md_engine::create_flav_md;
 ///
+/// let md_text = "# sample".to_string();
+/// let css_text = r#"..flav-md-h1 {
+///     color: red
+/// }"#.to_string();
+///
 /// create_flav_md()
 ///     .build(md_text, css_text);
 /// ```
