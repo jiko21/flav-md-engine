@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license-file = "LICENSE"
 authors = ["Jiko21 <sos.daiki.keion@gmail.com>"]
+description = "markdown parse with css style. Rust implementation for flav-md(https://github.com/jiko21/flav-md)"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
