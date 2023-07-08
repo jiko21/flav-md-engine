@@ -10,7 +10,7 @@ description = "markdown parse with css style. Rust implementation for flav-md(ht
 [dependencies]
 regex = "1.5"
 once_cell = "1.9.0"
-pretty_assertions = { version= "1.0.0", default-features = false, features = ["alloc"] }
+pretty_assertions = { version= "1.4.0", default-features = false, features = ["alloc"] }
 wasm-bindgen = "0.2.63"
 console_error_panic_hook = { version = "0.1.6", optional = true }
 wee_alloc = { version = "0.4.5", optional = true }
